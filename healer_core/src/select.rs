@@ -43,7 +43,7 @@ pub fn select_with_calls(ctx: &Context, rng: &mut RngType) -> SyscallId {
         select_res_output_syscall, // 15%
         select_random_syscall,     // 5%
     ];
-    const WEIGHTS: [Weight; 4] = [0, 80, 95, 100];
+    const WEIGHTS: [Weight; 4] = [60, 80, 95, 100];
 
     loop {
         let idx = choose_weighted(rng, &WEIGHTS);
