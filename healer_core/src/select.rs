@@ -56,53 +56,56 @@ pub fn select_with_calls(ctx: &Context, rng: &mut RngType) -> SyscallId {
 
 /// Select based on generated calls and relations.
 pub fn select_with_relation(ctx: &Context, rng: &mut RngType) -> Option<SyscallId> {
-    let mut candidates: HashMap<SyscallId, Weight> = HashMap::new();
-    let r = ctx.relation().inner.read().unwrap();
-    let calls = ctx.calls();
-
-    for sid in calls.iter().map(|c| c.sid()) {
-        for candidate in r.influence_of(sid).iter().copied() {
-            let entry = candidates.entry(candidate).or_default();
-            *entry += 1;
-        }
-    }
-
-    let candidates: Vec<(SyscallId, Weight)> = candidates.into_iter().collect();
-    candidates
-        .choose_weighted(rng, |candidate| candidate.1)
-        .ok()
-        .map(|candidate| candidate.0)
+    // let mut candidates: HashMap<SyscallId, Weight> = HashMap::new();
+    // let r = ctx.relation().inner.read().unwrap();
+    // let calls = ctx.calls();
+    //
+    // for sid in calls.iter().map(|c| c.sid()) {
+    //     for candidate in r.influence_of(sid).iter().copied() {
+    //         let entry = candidates.entry(candidate).or_default();
+    //         *entry += 1;
+    //     }
+    // }
+    //
+    // let candidates: Vec<(SyscallId, Weight)> = candidates.into_iter().collect();
+    // candidates
+    //     .choose_weighted(rng, |candidate| candidate.1)
+    //     .ok()
+    //     .map(|candidate| candidate.0)
+    select_random_syscall(ctx, rng)
 }
 
 /// Select syscall that can output resources.
 pub fn select_res_output_syscall(ctx: &Context, rng: &mut RngType) -> Option<SyscallId> {
-    let selected_res_kind = if ctx.res().is_empty() || rng.gen_ratio(1, 5) {
-        ctx.target().res_kinds().choose(rng).unwrap()
-    } else {
-        let res_base = ctx.res().choose(rng).unwrap();
-        if rng.gen() {
-            ctx.target().res_sub_tys(res_base).choose(rng).unwrap()
-        } else {
-            ctx.target().res_super_tys(res_base).choose(rng).unwrap()
-        }
-    };
-    ctx.target()
-        .res_output_syscall(selected_res_kind)
-        .choose(rng)
-        .copied()
+    // let selected_res_kind = if ctx.res().is_empty() || rng.gen_ratio(1, 5) {
+    //     ctx.target().res_kinds().choose(rng).unwrap()
+    // } else {
+    //     let res_base = ctx.res().choose(rng).unwrap();
+    //     if rng.gen() {
+    //         ctx.target().res_sub_tys(res_base).choose(rng).unwrap()
+    //     } else {
+    //         ctx.target().res_super_tys(res_base).choose(rng).unwrap()
+    //     }
+    // };
+    // ctx.target()
+    //     .res_output_syscall(selected_res_kind)
+    //     .choose(rng)
+    //     .copied()
+    select_random_syscall(ctx, rng)
 }
 
 /// Select syscall that consume current resource
 pub fn select_res_input_syscall(ctx: &Context, rng: &mut RngType) -> Option<SyscallId> {
-    if let Some(mut res) = ctx.res().choose(rng) {
-        if rng.gen_ratio(3, 10) {
-            // use syscalls that take super type of 'res' as input
-            res = ctx.target().res_sub_tys(res).choose(rng).unwrap();
-        }
-        ctx.target().res_input_syscall(res).choose(rng).copied()
-    } else {
-        None
-    }
+    // if let Some(mut res) = ctx.res().choose(rng) {
+    //     if rng.gen_ratio(3, 10) {
+    //         // use syscalls that take super type of 'res' as input
+    //         res = ctx.target().res_sub_tys(res).choose(rng).unwrap();
+    //     }
+    //     ctx.target().res_input_syscall(res).choose(rng).copied()
+    // } else {
+    //     None
+    // }
+    select_random_syscall(ctx, rng)
 }
 
 /// Select syscall randomly
