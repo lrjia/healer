@@ -249,27 +249,27 @@ impl Fuzzer {
         });
 
         // detect relations
-        let relation = Arc::clone(&self.shared_state.relation);
-        let found_new = relation.try_update(&p, idx, |new_p, new_idx| {
-            for _ in 0..3 {
-                if let Ok(Some(brs)) = self.reexec(new_p, new_idx) {
-                    return brs.intersection(&new).copied().count() != new.len();
-                }
-            }
-            false
-        });
-        if found_new {
-            let a = self
-                .shared_state
-                .target
-                .syscall_of(p.calls()[idx - 1].sid());
-            let b = self.shared_state.target.syscall_of(p.calls()[idx].sid());
-            self.shared_state
-                .stats
-                .set_re(self.shared_state.relation.num() as u64);
-            // TODO dump relations
-            fuzzer_debug!("new relation: {} -> {}", a.name(), b.name());
-        }
+        // let relation = Arc::clone(&self.shared_state.relation);
+        // let found_new = relation.try_update(&p, idx, |new_p, new_idx| {
+        //     for _ in 0..3 {
+        //         if let Ok(Some(brs)) = self.reexec(new_p, new_idx) {
+        //             return brs.intersection(&new).copied().count() != new.len();
+        //         }
+        //     }
+        //     false
+        // });
+        // if found_new {
+        //     let a = self
+        //         .shared_state
+        //         .target
+        //         .syscall_of(p.calls()[idx - 1].sid());
+        //     let b = self.shared_state.target.syscall_of(p.calls()[idx].sid());
+        //     self.shared_state
+        //         .stats
+        //         .set_re(self.shared_state.relation.num() as u64);
+        //     // TODO dump relations
+        //     fuzzer_debug!("new relation: {} -> {}", a.name(), b.name());
+        // }
 
         // save to local
         self.do_save_prog(p.clone(), &brs)?;
