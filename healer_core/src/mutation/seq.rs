@@ -72,35 +72,36 @@ pub fn remove_call(ctx: &mut Context, _corpus: &CorpusWrapper, rng: &mut RngType
 
 /// Select new call to location `idx`.
 fn select_call_to(ctx: &mut Context, rng: &mut RngType, idx: usize) -> SyscallId {
-    let mut candidates: HashMap<SyscallId, u64> = HashMap::new();
-    let r = ctx.relation().inner.read().unwrap();
-    let calls = ctx.calls();
-
-    // first, consider calls that can be influenced by calls before `idx`.
-    for sid in calls[..idx].iter().map(|c| c.sid()) {
-        for candidate in r.influence_of(sid).iter().copied() {
-            let entry = candidates.entry(candidate).or_default();
-            *entry += 1;
-        }
-    }
-
-    // then, consider calls that can be influence calls after `idx`.
-    if idx != calls.len() {
-        for sid in calls[idx..].iter().map(|c| c.sid()) {
-            for candidate in r.influence_by_of(sid).iter().copied() {
-                let entry = candidates.entry(candidate).or_default();
-                *entry += 1;
-            }
-        }
-    }
-
-    let candidates: Vec<(SyscallId, u64)> = candidates.into_iter().collect();
-    if let Ok(candidate) = candidates.choose_weighted(rng, |candidate| candidate.1) {
-        candidate.0
-    } else {
-        // failed to select with relation, use normal strategy.
-        select_with_calls(ctx, rng)
-    }
+    // let mut candidates: HashMap<SyscallId, u64> = HashMap::new();
+    // let r = ctx.relation().inner.read().unwrap();
+    // let calls = ctx.calls();
+    //
+    // // first, consider calls that can be influenced by calls before `idx`.
+    // for sid in calls[..idx].iter().map(|c| c.sid()) {
+    //     for candidate in r.influence_of(sid).iter().copied() {
+    //         let entry = candidates.entry(candidate).or_default();
+    //         *entry += 1;
+    //     }
+    // }
+    //
+    // // then, consider calls that can be influence calls after `idx`.
+    // if idx != calls.len() {
+    //     for sid in calls[idx..].iter().map(|c| c.sid()) {
+    //         for candidate in r.influence_by_of(sid).iter().copied() {
+    //             let entry = candidates.entry(candidate).or_default();
+    //             *entry += 1;
+    //         }
+    //     }
+    // }
+    //
+    // let candidates: Vec<(SyscallId, u64)> = candidates.into_iter().collect();
+    // if let Ok(candidate) = candidates.choose_weighted(rng, |candidate| candidate.1) {
+    //     candidate.0
+    // } else {
+    //     // failed to select with relation, use normal strategy.
+    //     select_with_calls(ctx, rng)
+    // }
+    select_with_calls(ctx, rng)
 }
 
 /// Mapping resource id of `calls`, make sure all `res_id` in `calls` is bigger then current `next_res_id`
